@@ -1,0 +1,229 @@
+/* Generator row container */
+.generator-row {
+    background: rgba(255, 255, 255, 0.5);
+    border: 3px solid #A8B5D1;
+    margin-bottom: 12px;
+    padding: 12px;
+    position: relative;
+}
+
+.generator-row.unlocked {
+    border-color: currentColor;
+    border-width: 4px;
+}
+
+.generator-row.locked {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+/* Generator header */
+.generator-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.generator-color-indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #333;
+    display: inline-block;
+    margin-right: 8px;
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.generator-name {
+    font-size: 12px;
+    color: #333;
+    flex: 1;
+}
+
+.generator-level {
+    font-size: 14px;
+    color: #333;
+    margin-left: 8px;
+}
+
+.generator-maxed {
+    font-size: 10px;
+    color: #FFD93D;
+    margin-left: 8px;
+    animation: rainbow 2s infinite;
+}
+
+@keyframes rainbow {
+    0%, 100% { color: #FFD93D; }
+    16% { color: #FF9ECD; }
+    33% { color: #6EC1E4; }
+    50% { color: #7FE7CC; }
+    66% { color: #B4A7D6; }
+    83% { color: #FFB499; }
+}
+
+/* Progress bars */
+.progress-container {
+    margin: 8px 0;
+}
+
+.progress-label {
+    font-size: 8px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.progress-bar {
+    height: 16px;
+    background: #D4D4D4;
+    border: 2px inset #A8A8A8;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(180deg, #66CC66 0%, #4D9F4D 100%);
+    transition: width 0.1s linear;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 4px,
+        rgba(255, 255, 255, 0.1) 4px,
+        rgba(255, 255, 255, 0.1) 8px
+    );
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    color: #333;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+    z-index: 1;
+}
+
+/* Milestone progress (circular) */
+.milestone-progress {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    margin: 8px auto;
+}
+
+.milestone-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 4px solid #D4D4D4;
+    position: relative;
+    background: conic-gradient(
+        from 0deg,
+        #66CC66 0%,
+        #66CC66 var(--progress, 0%),
+        #D4D4D4 var(--progress, 0%),
+        #D4D4D4 100%
+    );
+    mask: radial-gradient(circle at center, transparent 40%, black 40%);
+    -webkit-mask: radial-gradient(circle at center, transparent 40%, black 40%);
+}
+
+.milestone-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    color: #333;
+    text-align: center;
+}
+
+/* Generator stats */
+.generator-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 8px 0;
+    font-size: 10px;
+}
+
+.generator-stat-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.generator-stat-label {
+    color: #666;
+}
+
+.generator-stat-value {
+    color: #333;
+    font-weight: bold;
+}
+
+/* Buy buttons */
+.generator-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.buy-button {
+    flex: 1;
+    min-width: 80px;
+    font-size: 10px;
+    padding: 6px 12px;
+}
+
+.buy-button.cannot-afford {
+    background: #8B8B8B;
+    color: #D4D4D4;
+    border-color: #6B6B6B;
+}
+
+.buy-button.can-afford-1 {
+    background: #FFD93D;
+    color: #333;
+    border-color: #FFED4E;
+}
+
+.buy-button.can-afford-3 {
+    background: #FF9933;
+    color: #FFF;
+    border-color: #FFB366;
+}
+
+.buy-button.can-afford-13 {
+    background: #66CC66;
+    color: #FFF;
+    border-color: #4D9F4D;
+}
+
+/* Locked generator message */
+.generator-locked {
+    text-align: center;
+    padding: 20px;
+    font-size: 10px;
+    color: #888;
+}
+
+.generator-unlock-cost {
+    font-size: 12px;
+    color: #FFD93D;
+    margin-top: 8px;
+}
+

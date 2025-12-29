@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incremental Idle - Retro Pixel Edition</title>
+    <link rel="stylesheet" href="styles/pixel-font.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/windows.css">
+    <link rel="stylesheet" href="styles/generators.css">
+</head>
+<body>
+    <!-- Background elements -->
+    <div class="background-clouds"></div>
+    
+    <!-- Main Game Window -->
+    <div class="window active" id="main-window" data-window="generators">
+        <div class="window-titlebar" data-draggable="true">
+            <span class="window-title">generators.exe</span>
+            <div class="window-controls">
+                <button class="window-button" title="Minimize">☐</button>
+                <button class="window-button" title="Maximize">▢</button>
+                <button class="window-button" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="window-content" id="generators-content">
+            <!-- Generator rows will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Stats Window -->
+    <div class="window" id="stats-window" data-window="stats">
+        <div class="window-titlebar" data-draggable="true">
+            <span class="window-title">stats.sys</span>
+            <div class="window-controls">
+                <button class="window-button" title="Minimize">☐</button>
+                <button class="window-button" title="Maximize">▢</button>
+                <button class="window-button" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="stat-row">
+                <div class="stat-label">CURRENT BALANCE</div>
+                <div class="stat-value" id="current-balance">¤ 0</div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">INCOME</div>
+                <div class="stat-value" id="income-per-sec">⚡ 0 / sec</div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">PRESTIGE READY</div>
+                <div class="stat-value" id="prestige-value">✦ 0</div>
+                <div class="stat-subtext" id="idle-multiplier">(×1.0 idle bonus)</div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">LIFETIME EARNED</div>
+                <div class="stat-value" id="lifetime-earned">📊 0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prestige Window -->
+    <div class="window" id="prestige-window" data-window="prestige">
+        <div class="window-titlebar" data-draggable="true">
+            <span class="window-title">prestige.bat</span>
+            <div class="window-controls">
+                <button class="window-button" title="Minimize">☐</button>
+                <button class="window-button" title="Maximize">▢</button>
+                <button class="window-button" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="prestige-header">
+                <div class="prestige-label">PRESTIGE AVAILABLE</div>
+                <div class="prestige-value-display" id="prestige-display">✦ 0</div>
+                <div class="prestige-subtext" id="prestige-idle-text">(×1.0 idle)</div>
+            </div>
+            
+            <div id="selectable-prestige-section" style="display: none;">
+                <div class="selectable-label">SELECTABLE PRESTIGE</div>
+                <div class="selectable-count" id="selectable-count">2 left</div>
+                <div class="selectable-controls">
+                    <label>Target:</label>
+                    <select id="selectable-generator" class="pixel-select"></select>
+                    <label>Bonus:</label>
+                    <select id="selectable-bonus" class="pixel-select">
+                        <option value="earn">Earn Boost</option>
+                        <option value="speed">Speed Boost</option>
+                        <option value="cost">Cost Reduction</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button class="pixel-button prestige-button" id="prestige-button">RESET & GAIN BONUS</button>
+            
+            <div class="prestige-history">
+                <div class="prestige-history-label">RECENT PRESTIGE:</div>
+                <div id="prestige-history-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Window -->
+    <div class="window" id="settings-window" data-window="settings">
+        <div class="window-titlebar" data-draggable="true">
+            <span class="window-title">config.ini</span>
+            <div class="window-controls">
+                <button class="window-button" title="Minimize">☐</button>
+                <button class="window-button" title="Maximize">▢</button>
+                <button class="window-button" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="window-content">
+            <div class="settings-row">
+                <label>Sound:</label>
+                <input type="checkbox" id="sound-toggle" checked>
+            </div>
+            <div class="settings-row">
+                <label>Buy Mode:</label>
+                <div class="buy-mode-selector">
+                    <button class="pixel-button small" data-mode="1">1</button>
+                    <button class="pixel-button small" data-mode="10">10</button>
+                    <button class="pixel-button small" data-mode="-1">MAX</button>
+                </div>
+            </div>
+            <div class="settings-row">
+                <label>Sticky Mode:</label>
+                <input type="checkbox" id="sticky-mode-toggle">
+            </div>
+            <div class="settings-row">
+                <button class="pixel-button" id="save-button">SAVE GAME</button>
+                <button class="pixel-button" id="load-button">LOAD GAME</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification overlay -->
+    <div id="notification-overlay" class="notification-overlay"></div>
+
+    <!-- Scripts - Load libraries first, then modules -->
+    <script src="https://cdn.jsdelivr.net/npm/break_infinity.js@2.0.0/dist/break_infinity.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+    <script>
+        // Ensure Decimal is available globally
+        if (typeof Decimal === 'undefined' && typeof window.Decimal !== 'undefined') {
+            window.Decimal = window.Decimal;
+        }
+    </script>
+    <script type="module" src="scripts/config.js"></script>
+    <script type="module" src="scripts/game.js"></script>
+    <script type="module" src="scripts/generators.js"></script>
+    <script type="module" src="scripts/prestige.js"></script>
+    <script type="module" src="scripts/ui.js"></script>
+    <script type="module" src="scripts/save.js"></script>
+</body>
+</html>
+
