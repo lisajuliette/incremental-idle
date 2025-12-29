@@ -51,7 +51,7 @@ export default function GeneratorCard({
 
 	// Calculate values
 	const level = generator.level;
-	const isMaxed = level >= 400;
+	const isMaxed = level >= 500;
 	const milestoneProgress = getMilestoneProgress(level);
 	const fillPercent = Math.min(100, generator.fillProgress * 100);
 	const milestonePercent = Math.min(100, milestoneProgress.progress * 100);

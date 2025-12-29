@@ -61,6 +61,7 @@ export interface SaveData {
             lastSave: number;
             lastTick: number;
             sessionStart: number;
+            lastPrestige: number;
         };
         
         // User settings
@@ -128,7 +129,8 @@ export async function saveGame(gameState: GameState): Promise<{ success: boolean
                 timestamps: {
                     lastSave: Date.now(),
                     lastTick: gameState.timestamps.lastTick,
-                    sessionStart: gameState.timestamps.sessionStart
+                    sessionStart: gameState.timestamps.sessionStart,
+                    lastPrestige: gameState.timestamps.lastPrestige
                 },
                 
                 // User settings
@@ -236,11 +238,12 @@ export async function loadGame(): Promise<{ success: boolean; state?: Partial<Ga
             },
             
             // Timestamps
-            timestamps: {
-                lastSave: saveData.state.timestamps?.lastSave || Date.now(),
-                lastTick: Date.now(), // Reset to now for new session
-                sessionStart: Date.now() // New session
-            },
+                timestamps: {
+                    lastSave: saveData.state.timestamps?.lastSave || Date.now(),
+                    lastTick: Date.now(), // Reset to now for new session
+                    sessionStart: Date.now(), // New session
+                    lastPrestige: saveData.state.timestamps?.lastPrestige || Date.now() // Use saved value or current time
+                },
             
             // Settings
             settings: {

@@ -195,3 +195,4 @@ Users can change themes in the Settings screen:
 - Animated theme transitions
 
 
+

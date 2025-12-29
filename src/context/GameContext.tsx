@@ -58,7 +58,8 @@ export function GameProvider({ children }: GameProviderProps) {
             timestamps: {
                 lastSave: Date.now(),
                 lastTick: Date.now(),
-                sessionStart: Date.now()
+                sessionStart: Date.now(),
+                lastPrestige: Date.now() // Start of current prestige run
             },
             
             settings: {
@@ -98,7 +99,8 @@ export function GameProvider({ children }: GameProviderProps) {
                         timestamps: {
                             ...prevState.timestamps,
                             ...state.timestamps,
-                            sessionStart: Date.now()
+                            sessionStart: Date.now(),
+                            lastPrestige: state.timestamps?.lastPrestige || prevState.timestamps.lastPrestige || Date.now()
                         }
                     };
                     // Store in ref immediately
@@ -137,7 +139,8 @@ export function GameProvider({ children }: GameProviderProps) {
                     timestamps: {
                         lastSave: Date.now(),
                         lastTick: Date.now(),
-                        sessionStart: Date.now()
+                        sessionStart: Date.now(),
+                        lastPrestige: Date.now() // Start of current prestige run
                     },
                     settings: {
                         soundEnabled: true,
@@ -165,8 +168,8 @@ export function GameProvider({ children }: GameProviderProps) {
                 // Update generators (production, fill progress)
                 updateGenerators(newState.generators, deltaTime, newState);
                 
-                // Update idle multiplier
-                updateIdleMultiplier(deltaTime, newState);
+                // Update idle multiplier based on time since last prestige
+                updateIdleMultiplier(newState);
                 
                 // Update time played (accumulate session time)
                 const sessionTime = Date.now() - sessionStartTimeRef.current;
@@ -273,7 +276,8 @@ export function GameProvider({ children }: GameProviderProps) {
                     timestamps: {
                         lastSave: Date.now(),
                         lastTick: Date.now(),
-                        sessionStart: Date.now()
+                        sessionStart: Date.now(),
+                        lastPrestige: Date.now() // Start of current prestige run
                     },
                     settings: prevState.settings // Keep settings
                 };

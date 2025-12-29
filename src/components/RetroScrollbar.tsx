@@ -94,6 +94,7 @@ export default function RetroScrollbar({
 			</ScrollView>
 			{showScrollbar && (
 				<View
+					className="my-2"
 					style={[styles.scrollbarContainer, { borderColor: lightestColor }]}
 				>
 					{/* Up Arrow Button */}

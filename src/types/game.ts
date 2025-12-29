@@ -39,6 +39,7 @@ export interface Timestamps {
     lastSave: number;
     lastTick: number;
     sessionStart: number;
+    lastPrestige: number; // Timestamp of last prestige (or game start if never prestiged)
 }
 
 export interface GameSettings {

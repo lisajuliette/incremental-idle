@@ -24,6 +24,32 @@ function formatTimeAgo(timestamp: number): string {
     return 'just now';
 }
 
+function formatDuration(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (days > 0) {
+        const remainingHours = hours % 24;
+        if (remainingHours > 0) {
+            return `${days}d ${remainingHours}h`;
+        }
+        return `${days}d`;
+    }
+    if (hours > 0) {
+        const remainingMinutes = minutes % 60;
+        if (remainingMinutes > 0) {
+            return `${hours}h ${remainingMinutes}m`;
+        }
+        return `${hours}h`;
+    }
+    if (minutes > 0) {
+        return `${minutes}m`;
+    }
+    return `${seconds}s`;
+}
+
 export default function StatsScreen() {
     const { gameState } = useGame();
     const { theme } = useTheme();
@@ -89,6 +115,16 @@ export default function StatsScreen() {
             </View>
 
             <View className="mb-6">
+                <Text className={`text-xs font-mono ${theme.text.secondary} mb-1 uppercase`}>PRESTIGE LIFETIME</Text>
+                <View className="flex-row items-center">
+                    <MaterialIcons name="schedule" size={20} color="#57534E" className="mr-2" />
+                    <Text className={`text-sm font-mono ${theme.text.primary} mb-2`}>
+                        {formatDuration(Date.now() - (gameState.timestamps.lastPrestige || gameState.timestamps.sessionStart))}
+                    </Text>
+                </View>
+            </View>
+
+            <View className="mb-6">
                 <Text className={`text-xs font-mono ${theme.text.secondary} mb-1 uppercase`}>LAST SAVE</Text>
                 <View className="flex-row items-center">
                     <MaterialIcons name="access-time" size={20} color="#57534E" className="mr-2" />
@@ -96,7 +132,7 @@ export default function StatsScreen() {
                         {formatTimeAgo(gameState.timestamps.lastSave)}
                     </Text>
                 </View>
-                </View>
+            </View>
                     </ScrollView>
                 </Window>
             </View>

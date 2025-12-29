@@ -38,7 +38,7 @@ export default function Window({
 		>
 			{/* Title Bar */}
 			<View
-				className={`${theme.chrome.titleBar} flex-row items-center justify-between px-2 py-1 border-b-2 min-h-[28px] ${theme.chrome.border}`}
+				className={`${theme.chrome.titleBar} flex-row items-center justify-between px-1 py-1 border-b-2 min-h-[28px] ${theme.chrome.border}`}
 			>
 				<Text
 					className={`text-[10px] tracking-wide ${theme.chrome.text}`}
@@ -81,7 +81,7 @@ export default function Window({
 			</View>
 
 			{/* Window Content */}
-			<View className={`flex-1 bg-transparent ${compact ? 'p-0' : 'p-3'}`}>
+			<View className={`flex-1 bg-transparent ${compact ? 'p-0' : 'px-1'}`}>
 				{children}
 			</View>
 		</View>

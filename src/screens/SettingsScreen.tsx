@@ -36,6 +36,28 @@ export default function SettingsScreen() {
 		}));
 	};
 
+	const cycleBuyMode = (): void => {
+		const buyModes = [1, 10, -1, -2]; // 1, 10, MAX, NEXT
+		const currentIndex = buyModes.indexOf(gameState.settings.buyMode);
+		const nextIndex = (currentIndex + 1) % buyModes.length;
+		handleBuyModeChange(buyModes[nextIndex]);
+	};
+
+	const getBuyModeLabel = (mode: number): string => {
+		switch (mode) {
+			case 1:
+				return '1';
+			case 10:
+				return '10';
+			case -1:
+				return 'MAX';
+			case -2:
+				return 'NEXT';
+			default:
+				return '1';
+		}
+	};
+
 	const handleSoundToggle = (value: boolean): void => {
 		setGameState((prevState) => ({
 			...prevState,
@@ -164,80 +186,14 @@ export default function SettingsScreen() {
 									Buy Mode:
 								</Text>
 							</View>
-							<View className="flex-row gap-2 flex-wrap">
-								<TouchableOpacity
-									className={`p-2 min-w-[50px] ${
-										gameState.settings.buyMode === 1
-											? `${theme.button.success} border-green-600`
-											: 'bg-stone-300 border-stone-400'
-									} border-2 rounded items-center`}
-									onPress={() => handleBuyModeChange(1)}
-								>
-									<Text
-										className={`text-xs font-mono ${
-											gameState.settings.buyMode === 1
-												? 'text-white'
-												: theme.text.primary
-										}`}
-									>
-										1
-									</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
-									className={`p-2 min-w-[50px] ${
-										gameState.settings.buyMode === 10
-											? `${theme.button.success} border-green-600`
-											: 'bg-stone-300 border-stone-400'
-									} border-2 rounded items-center`}
-									onPress={() => handleBuyModeChange(10)}
-								>
-									<Text
-										className={`text-xs font-mono ${
-											gameState.settings.buyMode === 10
-												? 'text-white'
-												: theme.text.primary
-										}`}
-									>
-										10
-									</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
-									className={`p-2 min-w-[50px] ${
-										gameState.settings.buyMode === -1
-											? `${theme.button.success} border-green-600`
-											: 'bg-stone-300 border-stone-400'
-									} border-2 rounded items-center`}
-									onPress={() => handleBuyModeChange(-1)}
-								>
-									<Text
-										className={`text-xs font-mono ${
-											gameState.settings.buyMode === -1
-												? 'text-white'
-												: theme.text.primary
-										}`}
-									>
-										MAX
-									</Text>
-								</TouchableOpacity>
-								<TouchableOpacity
-									className={`p-2 min-w-[50px] ${
-										gameState.settings.buyMode === -2
-											? `${theme.button.success} border-green-600`
-											: 'bg-stone-300 border-stone-400'
-									} border-2 rounded items-center`}
-									onPress={() => handleBuyModeChange(-2)}
-								>
-									<Text
-										className={`text-xs font-mono ${
-											gameState.settings.buyMode === -2
-												? 'text-white'
-												: theme.text.primary
-										}`}
-									>
-										NEXT
-									</Text>
-								</TouchableOpacity>
-							</View>
+							<TouchableOpacity
+								className={`px-4 py-2 ${theme.button.success} border-green-600 border-2 rounded items-center`}
+								onPress={cycleBuyMode}
+							>
+								<Text className="text-xs font-mono text-white">
+									{getBuyModeLabel(gameState.settings.buyMode)}
+								</Text>
+							</TouchableOpacity>
 						</View>
 
 						<View className="flex-row items-center justify-between mb-6">

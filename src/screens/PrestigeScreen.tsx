@@ -55,10 +55,10 @@ export default function PrestigeScreen() {
     };
 
     const applyRandomPrestige = (prestigeValue: Decimal) => {
-        const unlockedGenerators = gameState.generators.filter(g => g.unlocked);
-        if (unlockedGenerators.length === 0) return;
+        // Allow bonuses on any generator, even locked ones
+        if (gameState.generators.length === 0) return;
 
-        const targetGenerator = unlockedGenerators[Math.floor(Math.random() * unlockedGenerators.length)];
+        const targetGenerator = gameState.generators[Math.floor(Math.random() * gameState.generators.length)];
         const bonusTypes: Array<'earn' | 'speed' | 'cost'> = ['earn', 'speed', 'cost'];
         const random = Math.random();
         let bonusType: 'earn' | 'speed' | 'cost' = 'earn';
@@ -74,8 +74,9 @@ export default function PrestigeScreen() {
     };
 
     const applySelectablePrestige = (generatorId: string, bonusType: 'earn' | 'speed' | 'cost', prestigeValue: Decimal) => {
+        // Allow bonuses on any generator, even locked ones
         const targetGenerator = gameState.generators.find(g => g.id === parseInt(generatorId));
-        if (!targetGenerator || !targetGenerator.unlocked) return;
+        if (!targetGenerator) return;
         applyPrestigeBonus(targetGenerator, bonusType, prestigeValue);
     };
 
@@ -123,6 +124,12 @@ export default function PrestigeScreen() {
             newState.generators.forEach(g => {
                 g.level = 0;
                 g.fillProgress = 0;
+                // Lock all generators except the first one (id: 1)
+                if (g.id !== 1) {
+                    g.unlocked = false;
+                } else {
+                    g.unlocked = true;
+                }
             });
 
             // Reset lifetime earnings to reset prestige value
@@ -130,6 +137,9 @@ export default function PrestigeScreen() {
             
             newState.prestige.totalPrestiges++;
             newState.prestige.currentIdleMultiplier = 1;
+            
+            // Reset last prestige timestamp to start new prestige run timer
+            newState.timestamps.lastPrestige = Date.now();
 
             Alert.alert(
                 'Prestige Complete!',
@@ -140,7 +150,8 @@ export default function PrestigeScreen() {
         });
     };
 
-    const unlockedGenerators = gameState.generators.filter(g => g.unlocked);
+    // Show all generators in the picker, not just unlocked ones
+    const allGenerators = gameState.generators;
 
     return (
         <RetroBackground>
@@ -174,8 +185,12 @@ export default function PrestigeScreen() {
                             className="bg-white border-2 border-stone-400 rounded"
                         >
                             <Picker.Item label="Choose Generator" value="" />
-                            {unlockedGenerators.map(gen => (
-                                <Picker.Item key={gen.id} label={gen.name} value={gen.id.toString()} />
+                            {allGenerators.map(gen => (
+                                <Picker.Item 
+                                    key={gen.id} 
+                                    label={gen.unlocked ? gen.name : `${gen.name} (Locked)`} 
+                                    value={gen.id.toString()} 
+                                />
                             ))}
                         </Picker>
                     </View>

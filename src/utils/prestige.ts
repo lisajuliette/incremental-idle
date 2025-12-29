@@ -3,7 +3,8 @@ import { GameState } from '../types/game';
 
 export function calculatePrestigeValue(gameState: GameState): Decimal {
     const totalEarned = gameState.stats.lifetimeEarnings;
-    const baseValue = totalEarned.div(10000).floor();
+    // 1 prestige point per 10 million currency earned (may increase in future)
+    const baseValue = totalEarned.div(10000000).floor();
     
     // Idle multiplier grows while player is away
     const idleMultiplier = gameState.prestige.currentIdleMultiplier;
@@ -29,15 +30,18 @@ function applyPow(baseValue: Decimal, pow: number): Decimal {
     return new Decimal(powered + bonus).floor();
 }
 
-export function updateIdleMultiplier(deltaTime: number, gameState: GameState): void {
-    const hours = deltaTime / (1000 * 60 * 60);
-    const growthRate = 0.5 + (gameState.global.idlePower * 0.3); // Base 50% per hour + idle power
-    const maxHours = 24; // Cap at 24 hours
+export function updateIdleMultiplier(gameState: GameState): void {
+    // Calculate time since last prestige (or game start)
+    const now = Date.now();
+    const lastPrestigeTime = gameState.timestamps.lastPrestige || gameState.timestamps.sessionStart;
+    const hoursSinceLastPrestige = (now - lastPrestigeTime) / (1000 * 60 * 60);
     
-    const cappedHours = Math.min(hours, maxHours);
-    const multiplierIncrease = cappedHours * growthRate;
+    // Cap at 24 hours - at 24 hours, multiplier = 2x (double prestige points)
+    const cappedHours = Math.min(hoursSinceLastPrestige, 24);
     
-    gameState.prestige.currentIdleMultiplier = 1 + multiplierIncrease;
+    // Linear growth: 1x at 0 hours, 2x at 24 hours
+    // Formula: 1 + (hours / 24)
+    gameState.prestige.currentIdleMultiplier = 1 + (cappedHours / 24);
 }
 
 
