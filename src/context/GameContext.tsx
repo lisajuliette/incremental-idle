@@ -65,7 +65,7 @@ export function GameProvider({ children }: GameProviderProps) {
                 soundEnabled: true,
                 buyMode: 1,
                 buyModeSticky: false,
-                theme: 'pastel' as const
+                theme: 'nostalgia' as const
             }
         };
         
@@ -143,7 +143,7 @@ export function GameProvider({ children }: GameProviderProps) {
                         soundEnabled: true,
                         buyMode: 1,
                         buyModeSticky: false,
-                        theme: 'pastel' as const
+                        theme: 'nostalgia' as const
                     }
                 };
                 initialState.generators[0].unlocked = true;

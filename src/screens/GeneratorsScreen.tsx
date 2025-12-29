@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, ScrollView, Text } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGame } from '../context/GameContext';
 import { buyGenerator, unlockGenerator } from '../utils/generators';
@@ -8,6 +8,7 @@ import { Generator } from '../types/game';
 import Window from '../components/Window';
 import RetroBackground from '../components/RetroBackground';
 import GeneratorCard from '../components/GeneratorCard';
+import RetroScrollbar from '../components/RetroScrollbar';
 
 // Header component to display currency
 function HeaderRight() {
@@ -29,38 +30,44 @@ export default function GeneratorsScreen() {
 	const { gameState, setGameState } = useGame();
 	const insets = useSafeAreaInsets();
 
-	const handleBuy = (generator: Generator, amount: number) => {
-		setGameState((prevState) => {
-			const newState = { ...prevState };
-			const gen = newState.generators.find((g) => g.id === generator.id);
+	// Memoize handlers to prevent unnecessary re-renders of GeneratorCard
+	const handleBuy = useCallback(
+		(generator: Generator, amount: number) => {
+			setGameState((prevState) => {
+				const newState = { ...prevState };
+				const gen = newState.generators.find((g) => g.id === generator.id);
 
-			if (gen && buyGenerator(gen, amount, newState)) {
-				return newState;
-			}
-			return prevState;
-		});
-	};
+				if (gen && buyGenerator(gen, amount, newState)) {
+					return newState;
+				}
+				return prevState;
+			});
+		},
+		[setGameState]
+	);
 
-	const handleUnlock = (generator: Generator) => {
-		setGameState((prevState) => {
-			const newState = { ...prevState };
-			const gen = newState.generators.find((g) => g.id === generator.id);
+	const handleUnlock = useCallback(
+		(generator: Generator) => {
+			setGameState((prevState) => {
+				const newState = { ...prevState };
+				const gen = newState.generators.find((g) => g.id === generator.id);
 
-			if (gen && unlockGenerator(gen, newState)) {
-				return newState;
-			}
-			return prevState;
-		});
-	};
+				if (gen && unlockGenerator(gen, newState)) {
+					return newState;
+				}
+				return prevState;
+			});
+		},
+		[setGameState]
+	);
 
 	return (
 		<RetroBackground>
-			<View className="flex-1 p-4" style={{ paddingTop: insets.top }}>
+			<View className="flex-1 p-4">
 				<Window title="generators.exe" className="flex-1">
-					<ScrollView
+					<RetroScrollbar
 						className="flex-1"
 						contentContainerStyle={{ padding: 8 }}
-						showsVerticalScrollIndicator={false}
 					>
 						{gameState.generators.map((generator) => (
 							<GeneratorCard
@@ -71,7 +78,7 @@ export default function GeneratorsScreen() {
 								onUnlock={handleUnlock}
 							/>
 						))}
-					</ScrollView>
+					</RetroScrollbar>
 				</Window>
 			</View>
 		</RetroBackground>

@@ -119,12 +119,15 @@ export default function PrestigeScreen() {
             }
 
             // Reset game state
-            newState.currency = new Decimal(0);
+            newState.currency = new Decimal(10); // Start with 10 currency to buy first upgrade
             newState.generators.forEach(g => {
                 g.level = 0;
                 g.fillProgress = 0;
             });
 
+            // Reset lifetime earnings to reset prestige value
+            newState.stats.lifetimeEarnings = new Decimal(0);
+            
             newState.prestige.totalPrestiges++;
             newState.prestige.currentIdleMultiplier = 1;
 
@@ -141,7 +144,7 @@ export default function PrestigeScreen() {
 
     return (
         <RetroBackground>
-            <View className="flex-1 p-4" style={{ paddingTop: insets.top }}>
+            <View className="flex-1 p-4">
                 <Window title="prestige.bat" className="flex-1">
                     <ScrollView className="flex-1" contentContainerStyle={{ padding: 12 }}>
             <View className="items-center mb-6">
@@ -152,15 +155,12 @@ export default function PrestigeScreen() {
                         {formatNumber(prestigeValue)}
                     </Text>
                 </View>
-                <Text className={`text-xs font-mono ${theme.text.tertiary}`}>
-                    (×{gameState.prestige.currentIdleMultiplier.toFixed(2)} idle)
-                </Text>
             </View>
 
             {gameState.prestige.selectablesRemaining > 0 && (
                 <View className="mb-6 p-3 bg-white/30 rounded">
                     <View className="flex-row items-center mb-2">
-                        <MaterialIcons name="tune" size={16} color="#666" className="mr-1.5" />
+                        <MaterialIcons name="tune" size={16} color="#57534E" className="mr-1.5" />
                         <Text className={`text-xs font-mono ${theme.text.secondary} uppercase`}>SELECTABLE PRESTIGE</Text>
                     </View>
                     <Text className={`text-xs font-mono ${theme.text.accent} mb-3`}>
@@ -171,7 +171,7 @@ export default function PrestigeScreen() {
                         <Picker
                             selectedValue={selectedGenerator}
                             onValueChange={(value: string) => setSelectedGenerator(value)}
-                            className="bg-white border-2 border-gray-400 rounded"
+                            className="bg-white border-2 border-stone-400 rounded"
                         >
                             <Picker.Item label="Choose Generator" value="" />
                             {unlockedGenerators.map(gen => (
@@ -184,7 +184,7 @@ export default function PrestigeScreen() {
                         <Picker
                             selectedValue={selectedBonus}
                             onValueChange={(value: 'earn' | 'speed' | 'cost') => setSelectedBonus(value)}
-                            className="bg-white border-2 border-gray-400 rounded"
+                            className="bg-white border-2 border-stone-400 rounded"
                         >
                             <Picker.Item label="Earn Boost" value="earn" />
                             <Picker.Item label="Speed Boost" value="speed" />
@@ -203,7 +203,7 @@ export default function PrestigeScreen() {
                     <MaterialIcons 
                         name={prestigeValue.lte(0) ? "lock" : "refresh"} 
                         size={18} 
-                        color={prestigeValue.lte(0) ? "#666" : "#333"} 
+                        color={prestigeValue.lte(0) ? "#57534E" : "#44403C"} 
                         className="mr-2" 
                     />
                     <Text className={`text-sm font-mono ${theme.text.primary} uppercase`}>
@@ -216,7 +216,7 @@ export default function PrestigeScreen() {
 
             <View className="mt-4 pt-4 border-t-2 border-blue-300">
                 <View className="flex-row items-center mb-2">
-                    <MaterialIcons name="history" size={16} color="#666" className="mr-1.5" />
+                    <MaterialIcons name="history" size={16} color="#57534E" className="mr-1.5" />
                     <Text className={`text-xs font-mono ${theme.text.secondary} uppercase`}>RECENT PRESTIGE:</Text>
                 </View>
                 {gameState.prestige.history.length === 0 ? (

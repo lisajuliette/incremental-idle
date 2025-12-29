@@ -125,15 +125,15 @@ export function buildTheme(skin: SkinDefinition): Theme {
             primaryPressed: skin.colors.accent2,
             secondary: skin.colors.accent2,
             success: 'bg-green-500',
-            disabled: 'bg-gray-400',
-            disabledBorder: 'border-gray-500',
+            disabled: 'bg-stone-400',
+            disabledBorder: 'border-stone-500',
         },
         
         // Text colors
         text: {
-            primary: 'text-gray-800',
-            secondary: 'text-gray-600',
-            tertiary: 'text-gray-500',
+            primary: 'text-stone-800',
+            secondary: 'text-stone-600',
+            tertiary: 'text-stone-500',
             accent: `text-${skin.colors.accent1.replace('bg-', '')}`,
             white: 'text-white',
             success: 'text-green-500',
@@ -141,9 +141,9 @@ export function buildTheme(skin: SkinDefinition): Theme {
         
         // Progress bar colors
         progress: {
-            background: 'bg-gray-300',
+            background: 'bg-stone-300',
             fill: 'bg-green-500',
-            border: 'border-gray-400',
+            border: 'border-stone-400',
         },
         
         // Currency/stat colors
@@ -156,8 +156,8 @@ export function buildTheme(skin: SkinDefinition): Theme {
         // Border colors
         border: {
             default: skin.colors.border,
-            light: 'border-gray-200',
-            dark: 'border-gray-500',
+            light: 'border-stone-200',
+            dark: 'border-stone-500',
         },
     };
 }

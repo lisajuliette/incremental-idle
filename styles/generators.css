@@ -1,229 +1,241 @@
 /* Generator row container */
 .generator-row {
-    background: rgba(255, 255, 255, 0.5);
-    border: 3px solid #A8B5D1;
-    margin-bottom: 12px;
-    padding: 12px;
-    position: relative;
+	background: rgba(255, 255, 255, 0.5);
+	border: 3px solid #a8b5d1;
+	margin-bottom: 12px;
+	padding: 12px;
+	position: relative;
 }
 
 .generator-row.unlocked {
-    border-color: currentColor;
-    border-width: 4px;
+	border-color: currentColor;
+	border-width: 4px;
 }
 
 .generator-row.locked {
-    opacity: 0.5;
-    filter: grayscale(100%);
+	opacity: 0.5;
+	filter: grayscale(100%);
 }
 
 /* Generator header */
 .generator-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 8px;
 }
 
 .generator-color-indicator {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #333;
-    display: inline-block;
-    margin-right: 8px;
-    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3);
+	width: 16px;
+	height: 16px;
+	border: 2px solid #333;
+	display: inline-block;
+	margin-right: 8px;
+	box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3);
 }
 
 .generator-name {
-    font-size: 12px;
-    color: #333;
-    flex: 1;
+	font-size: 12px;
+	color: #333;
+	flex: 1;
 }
 
 .generator-level {
-    font-size: 14px;
-    color: #333;
-    margin-left: 8px;
+	font-size: 14px;
+	color: #333;
+	margin-left: 8px;
 }
 
 .generator-maxed {
-    font-size: 10px;
-    color: #FFD93D;
-    margin-left: 8px;
-    animation: rainbow 2s infinite;
+	font-size: 10px;
+	color: #ffd93d;
+	margin-left: 8px;
+	animation: rainbow 2s infinite;
 }
 
 @keyframes rainbow {
-    0%, 100% { color: #FFD93D; }
-    16% { color: #FF9ECD; }
-    33% { color: #6EC1E4; }
-    50% { color: #7FE7CC; }
-    66% { color: #B4A7D6; }
-    83% { color: #FFB499; }
+	0%,
+	100% {
+		color: #ffd93d;
+	}
+	16% {
+		color: #ff9ecd;
+	}
+	33% {
+		color: #6ec1e4;
+	}
+	50% {
+		color: #7fe7cc;
+	}
+	66% {
+		color: #b4a7d6;
+	}
+	83% {
+		color: #ffb499;
+	}
 }
 
 /* Progress bars */
 .progress-container {
-    margin: 8px 0;
+	margin: 8px 0;
 }
 
 .progress-label {
-    font-size: 8px;
-    color: #666;
-    margin-bottom: 4px;
+	font-size: 8px;
+	color: #666;
+	margin-bottom: 4px;
 }
 
 .progress-bar {
-    height: 16px;
-    background: #D4D4D4;
-    border: 2px inset #A8A8A8;
-    position: relative;
-    overflow: hidden;
+	height: 16px;
+	background: #d4d4d4;
+	border: 2px inset #a8a8a8;
+	position: relative;
+	overflow: hidden;
 }
 
 .progress-fill {
-    height: 100%;
-    background: linear-gradient(180deg, #66CC66 0%, #4D9F4D 100%);
-    transition: width 0.1s linear;
-    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3);
-    position: relative;
+	height: 100%;
+	background: linear-gradient(180deg, #66cc66 0%, #4d9f4d 100%);
+	transition: width 0.1s linear;
+	box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3);
+	position: relative;
 }
 
 .progress-fill::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 4px,
-        rgba(255, 255, 255, 0.1) 4px,
-        rgba(255, 255, 255, 0.1) 8px
-    );
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: repeating-linear-gradient(
+		90deg,
+		transparent,
+		transparent 4px,
+		rgba(255, 255, 255, 0.1) 4px,
+		rgba(255, 255, 255, 0.1) 8px
+	);
 }
 
 .progress-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 8px;
-    color: #333;
-    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
-    z-index: 1;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 8px;
+	color: #333;
+	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.8);
+	z-index: 1;
 }
 
 /* Milestone progress (circular) */
 .milestone-progress {
-    width: 60px;
-    height: 60px;
-    position: relative;
-    margin: 8px auto;
+	width: 60px;
+	height: 60px;
+	position: relative;
+	margin: 8px auto;
 }
 
 .milestone-circle {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 4px solid #D4D4D4;
-    position: relative;
-    background: conic-gradient(
-        from 0deg,
-        #66CC66 0%,
-        #66CC66 var(--progress, 0%),
-        #D4D4D4 var(--progress, 0%),
-        #D4D4D4 100%
-    );
-    mask: radial-gradient(circle at center, transparent 40%, black 40%);
-    -webkit-mask: radial-gradient(circle at center, transparent 40%, black 40%);
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	border: 4px solid #d4d4d4;
+	position: relative;
+	background: conic-gradient(
+		from 0deg,
+		#66cc66 0%,
+		#66cc66 var(--progress, 0%),
+		#d4d4d4 var(--progress, 0%),
+		#d4d4d4 100%
+	);
+	mask: radial-gradient(circle at center, transparent 40%, black 40%);
+	-webkit-mask: radial-gradient(circle at center, transparent 40%, black 40%);
 }
 
 .milestone-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 8px;
-    color: #333;
-    text-align: center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 8px;
+	color: #333;
+	text-align: center;
 }
 
 /* Generator stats */
 .generator-stats {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin: 8px 0;
-    font-size: 10px;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin: 8px 0;
+	font-size: 10px;
 }
 
 .generator-stat-row {
-    display: flex;
-    justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 }
 
 .generator-stat-label {
-    color: #666;
+	color: #666;
 }
 
 .generator-stat-value {
-    color: #333;
-    font-weight: bold;
+	color: #333;
+	font-weight: bold;
 }
 
 /* Buy buttons */
 .generator-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-    flex-wrap: wrap;
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+	flex-wrap: wrap;
 }
 
 .buy-button {
-    flex: 1;
-    min-width: 80px;
-    font-size: 10px;
-    padding: 6px 12px;
+	flex: 1;
+	min-width: 80px;
+	font-size: 10px;
+	padding: 6px 12px;
 }
 
 .buy-button.cannot-afford {
-    background: #8B8B8B;
-    color: #D4D4D4;
-    border-color: #6B6B6B;
+	background: #8b8b8b;
+	color: #d4d4d4;
+	border-color: #6b6b6b;
 }
 
 .buy-button.can-afford-1 {
-    background: #FFD93D;
-    color: #333;
-    border-color: #FFED4E;
+	background: #ffd93d;
+	color: #333;
+	border-color: #ffed4e;
 }
 
 .buy-button.can-afford-3 {
-    background: #FF9933;
-    color: #FFF;
-    border-color: #FFB366;
+	background: #ff9933;
+	color: #fff;
+	border-color: #ffb366;
 }
 
 .buy-button.can-afford-13 {
-    background: #66CC66;
-    color: #FFF;
-    border-color: #4D9F4D;
+	background: #66cc66;
+	color: #fff;
+	border-color: #4d9f4d;
 }
 
 /* Locked generator message */
 .generator-locked {
-    text-align: center;
-    padding: 20px;
-    font-size: 10px;
-    color: #888;
+	text-align: center;
+	padding: 20px;
+	font-size: 10px;
+	color: #888;
 }
 
 .generator-unlock-cost {
-    font-size: 12px;
-    color: #FFD93D;
-    margin-top: 8px;
+	font-size: 12px;
+	color: #ffd93d;
+	margin-top: 8px;
 }
-

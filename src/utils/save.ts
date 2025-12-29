@@ -249,7 +249,9 @@ export async function loadGame(): Promise<{ success: boolean; state?: Partial<Ga
                     : true,
                 buyMode: saveData.state.settings?.buyMode || 1,
                 buyModeSticky: saveData.state.settings?.buyModeSticky || false,
-                theme: (saveData.state.settings?.theme === 'green' ? 'green' : 'purple') as 'purple' | 'green'
+                theme: (saveData.state.settings?.theme && ['purple', 'green', 'pastel', 'nostalgia'].includes(saveData.state.settings.theme))
+                    ? saveData.state.settings.theme as 'purple' | 'green' | 'pastel' | 'nostalgia'
+                    : 'nostalgia' as const
             }
         };
         

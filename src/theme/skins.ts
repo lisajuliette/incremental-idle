@@ -10,7 +10,7 @@
  * 3. Add it to the SKINS object
  */
 
-export type SkinId = 'purple' | 'green' | 'pastel';
+export type SkinId = 'purple' | 'green' | 'pastel' | 'nostalgia';
 
 export interface SkinDefinition {
     id: SkinId;
@@ -117,19 +117,47 @@ export const GREEN_SKIN: SkinDefinition = {
 };
 
 /**
+ * Nostalgia Theme
+ * Uses stone colors for a warm, nostalgic retro feel
+ * Uses stone-200 for backgrounds and stone-400 for accents
+ */
+export const NOSTALGIA_SKIN: SkinDefinition = {
+    id: 'nostalgia',
+    name: 'Nostalgia',
+    description: 'Warm stone tones for a nostalgic retro feel',
+    colors: {
+        primary: 'bg-stone-200',        // Main background
+        secondary: 'bg-stone-200',       // Secondary background (same for consistency)
+        tertiary: 'bg-stone-200',        // Tertiary background (same for consistency)
+        
+        accent1: 'bg-stone-400',         // Primary accent
+        accent2: 'bg-stone-400',         // Secondary accent (same for consistency)
+        accent3: 'bg-stone-400',         // Tertiary accent (same for consistency)
+        
+        window: 'bg-white/85',
+        card: 'bg-white/50',
+        border: 'border-stone-400',
+        borderActive: 'border-stone-400',
+        titleBar: 'bg-stone-400',
+        titleBarActive: 'bg-stone-400',
+    },
+};
+
+/**
  * All available skins
  */
 export const SKINS: Record<SkinId, SkinDefinition> = {
     purple: PURPLE_SKIN,
     green: GREEN_SKIN,
     pastel: PASTEL_SKIN,
+    nostalgia: NOSTALGIA_SKIN,
 };
 
 /**
  * Get a skin by ID
  */
 export function getSkin(skinId: SkinId): SkinDefinition {
-    return SKINS[skinId] || SKINS.pastel; // Default to pastel for retro aesthetic
+    return SKINS[skinId] || SKINS.nostalgia; // Default to nostalgia for retro aesthetic
 }
 
 /**

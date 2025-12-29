@@ -12,11 +12,11 @@ Edit `src/theme/colors.js` to change any color:
 
 ```javascript
 export const theme = {
-  background: {
-    primary: 'bg-purple-100',  // Change to any Tailwind color
-    // ...
-  },
-  // ...
+	background: {
+		primary: 'bg-purple-100', // Change to any Tailwind color
+		// ...
+	},
+	// ...
 };
 ```
 
@@ -28,8 +28,8 @@ Import and use theme colors in components:
 import { theme } from '../theme/colors';
 
 <View className={theme.background.primary}>
-  <Text className={theme.text.primary}>Hello</Text>
-</View>
+	<Text className={theme.text.primary}>Hello</Text>
+</View>;
 ```
 
 ## Styling Guidelines
@@ -43,15 +43,14 @@ import { theme } from '../theme/colors';
 
 ```javascript
 <View className={`${theme.background.primary} p-4`}>
-  <Text className={`${theme.text.primary} text-lg font-mono`}>
-    Hello World
-  </Text>
+	<Text className={`${theme.text.primary} text-lg font-mono`}>Hello World</Text>
 </View>
 ```
 
 ## Available Tailwind Classes
 
 All standard Tailwind utility classes are available:
+
 - Layout: `flex`, `flex-row`, `items-center`, `justify-between`, etc.
 - Spacing: `p-4`, `m-2`, `gap-2`, etc.
 - Colors: Use theme colors or Tailwind color classes
@@ -67,9 +66,9 @@ To completely reskin the app:
 3. All components will automatically update
 
 Example: Change from purple theme to green theme:
+
 ```javascript
 background: {
   primary: 'bg-green-100',  // Changed from bg-purple-100
 }
 ```
-

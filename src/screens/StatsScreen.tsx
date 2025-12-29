@@ -32,7 +32,7 @@ export default function StatsScreen() {
 
     return (
         <RetroBackground>
-            <View className="flex-1 p-4" style={{ paddingTop: insets.top }}>
+            <View className="flex-1 p-4">
                 <Window title="stats.sys" className="flex-1">
                     <ScrollView className="flex-1" contentContainerStyle={{ padding: 12 }}>
             <View className="mb-6">
@@ -91,7 +91,7 @@ export default function StatsScreen() {
             <View className="mb-6">
                 <Text className={`text-xs font-mono ${theme.text.secondary} mb-1 uppercase`}>LAST SAVE</Text>
                 <View className="flex-row items-center">
-                    <MaterialIcons name="access-time" size={20} color="#666" className="mr-2" />
+                    <MaterialIcons name="access-time" size={20} color="#57534E" className="mr-2" />
                     <Text className={`text-sm font-mono ${theme.text.primary} mb-2`}>
                         {formatTimeAgo(gameState.timestamps.lastSave)}
                     </Text>

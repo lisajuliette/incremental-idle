@@ -45,7 +45,7 @@ export interface GameSettings {
     soundEnabled: boolean;
     buyMode: number; // 1, 10, or -1 for MAX
     buyModeSticky: boolean;
-    theme: 'purple' | 'green' | 'pastel'; // Theme skin ID
+    theme: 'purple' | 'green' | 'pastel' | 'nostalgia'; // Theme skin ID
 }
 
 export interface GameState {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useGame } from './GameContext';
 import { getTheme, Theme } from '../theme/colors';
 import { SkinId } from '../theme/skins';
@@ -24,11 +24,16 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
     const { gameState } = useGame();
-    const skinId: SkinId = gameState.settings.theme || 'purple';
-    const theme = getTheme(skinId);
+    const skinId: SkinId = gameState.settings.theme || 'nostalgia';
+    
+    // Memoize theme to prevent recreation on every render
+    const theme = useMemo(() => getTheme(skinId), [skinId]);
+    
+    // Memoize context value to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({ theme, skinId }), [theme, skinId]);
 
     return (
-        <ThemeContext.Provider value={{ theme, skinId }}>
+        <ThemeContext.Provider value={contextValue}>
             {children}
         </ThemeContext.Provider>
     );
