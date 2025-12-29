@@ -65,8 +65,8 @@ describe('Generator Calculations', () => {
 	});
 
 	describe('Cost Reduction (Prestige Buff)', () => {
-		test('Rose generator should apply cost reduction correctly', () => {
-			const roseConfig = GENERATORS.find((g) => g.name === 'Rose')!;
+		test('Orange generator should apply cost reduction correctly', () => {
+			const roseConfig = GENERATORS.find((g) => g.name === 'Orange')!;
 			const rose = createGenerator(roseConfig, {
 				level: 5,
 				costReduction: 1.5, // 50% cost reduction (costs are divided by this)
@@ -88,7 +88,7 @@ describe('Generator Calculations', () => {
 		});
 
 		test('Cost reduction should work for bulk purchases', () => {
-			const roseConfig = GENERATORS.find((g) => g.name === 'Rose')!;
+			const roseConfig = GENERATORS.find((g) => g.name === 'Orange')!;
 			const rose = createGenerator(roseConfig, {
 				level: 0,
 				costReduction: 2.0, // 2x cost reduction (50% cheaper)
@@ -117,7 +117,7 @@ describe('Generator Calculations', () => {
 		});
 
 		test('Cost reduction should affect max affordable calculation', () => {
-			const roseConfig = GENERATORS.find((g) => g.name === 'Rose')!;
+			const roseConfig = GENERATORS.find((g) => g.name === 'Orange')!;
 			const rose = createGenerator(roseConfig, {
 				level: 0,
 				costReduction: 1.5,
@@ -148,7 +148,7 @@ describe('Generator Calculations', () => {
 		});
 
 		test('Multiple cost reduction buffs should stack multiplicatively', () => {
-			const roseConfig = GENERATORS.find((g) => g.name === 'Rose')!;
+			const roseConfig = GENERATORS.find((g) => g.name === 'Orange')!;
 			// Simulate two 1.5x cost reduction buffs = 2.25x total
 			const rose = createGenerator(roseConfig, {
 				level: 0,
@@ -169,23 +169,23 @@ describe('Generator Calculations', () => {
 
 	describe('Earn Bonus (Prestige Buff)', () => {
 		test('Earn bonus should multiply production correctly', () => {
-			const yellowConfig = GENERATORS.find((g) => g.name === 'Yellow')!;
-			const yellow = createGenerator(yellowConfig, {
+			const redConfig = GENERATORS.find((g) => g.name === 'Red')!;
+			const red = createGenerator(redConfig, {
 				level: 10,
 				earnBonus: new Decimal(2.5), // 2.5x earn bonus
 			});
 
-			const production = getProduction(yellow);
+			const production = getProduction(red);
 
 			// Calculate expected production
 			// baseProduction * level * milestoneMultiplier * earnBonus
-			const baseProduction = yellow.baseProduction;
-			const level = yellow.level;
+			const baseProduction = red.baseProduction;
+			const level = red.level;
 			const milestoneMultiplier = 1; // No milestones at level 10
 			const expectedProduction = new Decimal(baseProduction)
 				.times(level)
 				.times(milestoneMultiplier)
-				.times(yellow.earnBonus);
+				.times(red.earnBonus);
 
 			expect(production.toNumber()).toBeCloseTo(
 				expectedProduction.toNumber(),
@@ -194,16 +194,16 @@ describe('Generator Calculations', () => {
 		});
 
 		test('Earn bonus should work with milestone multipliers', () => {
-			const yellowConfig = GENERATORS.find((g) => g.name === 'Yellow')!;
-			const yellow = createGenerator(yellowConfig, {
+			const redConfig = GENERATORS.find((g) => g.name === 'Red')!;
+			const red = createGenerator(redConfig, {
 				level: 50, // Past 25 and 50 milestones (2x * 2x = 4x multiplier)
 				earnBonus: new Decimal(1.5),
 			});
 
-			const production = getProduction(yellow);
+			const production = getProduction(red);
 
 			// Should have 4x milestone multiplier at level 50 (25 and 50 milestones)
-			const baseProduction = yellow.baseProduction;
+			const baseProduction = red.baseProduction;
 			const expectedProduction = new Decimal(baseProduction)
 				.times(50)
 				.times(4) // Milestone multiplier (2 milestones: 25 and 50)
@@ -216,16 +216,16 @@ describe('Generator Calculations', () => {
 		});
 
 		test('Multiple earn bonuses should stack multiplicatively', () => {
-			const yellowConfig = GENERATORS.find((g) => g.name === 'Yellow')!;
+			const redConfig = GENERATORS.find((g) => g.name === 'Red')!;
 			// Simulate two 1.5x earn bonuses = 2.25x total
-			const yellow = createGenerator(yellowConfig, {
+			const red = createGenerator(redConfig, {
 				level: 10,
 				earnBonus: new Decimal(2.25),
 			});
 
-			const production = getProduction(yellow);
+			const production = getProduction(red);
 			const productionWithoutBonus = getProduction(
-				createGenerator(yellowConfig, { level: 10, earnBonus: new Decimal(1) })
+				createGenerator(redConfig, { level: 10, earnBonus: new Decimal(1) })
 			);
 
 			// Should be 2.25x the base production
@@ -239,17 +239,17 @@ describe('Generator Calculations', () => {
 
 	describe('Speed Bonus (Prestige Buff)', () => {
 		test('Speed bonus should reduce fill time correctly', () => {
-			const yellowConfig = GENERATORS.find((g) => g.name === 'Yellow')!;
-			const yellow = createGenerator(yellowConfig, {
+			const redConfig = GENERATORS.find((g) => g.name === 'Red')!;
+			const red = createGenerator(redConfig, {
 				level: 1,
 				speedBonus: 2.0, // 2x speed (fill time is divided by this)
 			});
 
 			const gameState = createGameState(0);
-			gameState.generators = [yellow];
+			gameState.generators = [red];
 
 			// Update generators for 1000ms (1 second)
-			updateGenerators([yellow], 1000, gameState);
+			updateGenerators([red], 1000, gameState);
 
 			// With 2x speed bonus, fillTime (1000ms) becomes 500ms effective
 			// So in 1000ms, we should get 1000 / 500 = 2.0 fill progress
@@ -257,22 +257,22 @@ describe('Generator Calculations', () => {
 			// Actually, fillProgress accumulates, so if it's >= 1, it grants currency and resets
 			// So after 1000ms with 2x speed, we should have completed 2 cycles
 			// The remaining fillProgress should be close to 0 (since 2 cycles were completed)
-			expect(yellow.fillProgress).toBeGreaterThanOrEqual(0);
-			expect(yellow.fillProgress).toBeLessThan(1);
+			expect(red.fillProgress).toBeGreaterThanOrEqual(0);
+			expect(red.fillProgress).toBeLessThan(1);
 		});
 
 		test('Speed bonus should increase income per second', () => {
-			const yellowConfig = GENERATORS.find((g) => g.name === 'Yellow')!;
-			const yellow = createGenerator(yellowConfig, {
+			const redConfig = GENERATORS.find((g) => g.name === 'Red')!;
+			const red = createGenerator(redConfig, {
 				level: 1,
 				speedBonus: 1.5, // 1.5x speed
 			});
 
 			const gameState = createGameState(0);
-			gameState.generators = [yellow];
+			gameState.generators = [red];
 
 			// Update generators
-			updateGenerators([yellow], 1000, gameState);
+			updateGenerators([red], 1000, gameState);
 
 			// Income per second should be higher with speed bonus
 			const incomePerSecond = gameState.stats.incomePerSecond.toNumber();
@@ -284,28 +284,28 @@ describe('Generator Calculations', () => {
 		});
 
 		test('Multiple speed bonuses should stack multiplicatively', () => {
-			const yellowConfig = GENERATORS.find((g) => g.name === 'Yellow')!;
+			const redConfig = GENERATORS.find((g) => g.name === 'Red')!;
 			// Simulate two 1.5x speed bonuses = 2.25x total
-			const yellow = createGenerator(yellowConfig, {
+			const red = createGenerator(redConfig, {
 				level: 1,
 				speedBonus: 2.25,
 			});
 
 			const gameState = createGameState(0);
-			gameState.generators = [yellow];
+			gameState.generators = [red];
 
-			updateGenerators([yellow], 1000, gameState);
+			updateGenerators([red], 1000, gameState);
 
 			// With 2.25x speed, fill time = 1000 / 2.25 = 444.44ms
 			// In 1000ms, should complete 2 cycles (1000 / 444.44 = 2.25)
 			// Remaining fillProgress should be 0.25 (after 2 cycles completed)
-			expect(yellow.fillProgress).toBeCloseTo(0.25, 1);
+			expect(red.fillProgress).toBeCloseTo(0.25, 1);
 		});
 	});
 
 	describe('Combined Prestige Buffs', () => {
-		test('Rose generator with all three buffs should work correctly', () => {
-			const roseConfig = GENERATORS.find((g) => g.name === 'Rose')!;
+		test('Orange generator with all three buffs should work correctly', () => {
+			const roseConfig = GENERATORS.find((g) => g.name === 'Orange')!;
 			const rose = createGenerator(roseConfig, {
 				level: 5,
 				earnBonus: new Decimal(2.0), // 2x earn
@@ -342,15 +342,16 @@ describe('Generator Calculations', () => {
 			gameState.generators = [rose];
 			updateGenerators([rose], 1000, gameState);
 
-			// With 1.5x speed, fill time = 2000 / 1.5 = 1333.33ms
-			// In 1000ms, should get 1000 / 1333.33 = 0.75 fill progress
-			expect(rose.fillProgress).toBeCloseTo(0.75, 1);
+			// With 1.5x speed, fill time = 1100 / 1.5 = 733.33ms
+			// In 1000ms, should get 1000 / 733.33 = 1.36 fill progress
+			// After 1 cycle completes, remaining should be 0.36
+			expect(rose.fillProgress).toBeCloseTo(0.36, 1);
 		});
 	});
 
 	describe('Buy Generator with Cost Reduction', () => {
 		test('Buying should use cost reduction when calculating cost', () => {
-			const roseConfig = GENERATORS.find((g) => g.name === 'Rose')!;
+			const roseConfig = GENERATORS.find((g) => g.name === 'Orange')!;
 			const rose = createGenerator(roseConfig, {
 				level: 0,
 				costReduction: 2.0, // 2x cost reduction
@@ -395,15 +396,15 @@ describe('Generator Calculations', () => {
 		});
 
 		test('Earn bonus of 1 should not change production', () => {
-			const yellowConfig = GENERATORS.find((g) => g.name === 'Yellow')!;
-			const yellow = createGenerator(yellowConfig, {
+			const redConfig = GENERATORS.find((g) => g.name === 'Red')!;
+			const red = createGenerator(redConfig, {
 				level: 10,
 				earnBonus: new Decimal(1),
 			});
 
-			const production = getProduction(yellow);
+			const production = getProduction(red);
 			const productionWithBonus = getProduction(
-				createGenerator(yellowConfig, {
+				createGenerator(redConfig, {
 					level: 10,
 					earnBonus: new Decimal(2),
 				})
@@ -417,20 +418,20 @@ describe('Generator Calculations', () => {
 		});
 
 		test('Speed bonus of 1 should not change fill time', () => {
-			const yellowConfig = GENERATORS.find((g) => g.name === 'Yellow')!;
-			const yellow = createGenerator(yellowConfig, {
+			const redConfig = GENERATORS.find((g) => g.name === 'Red')!;
+			const red = createGenerator(redConfig, {
 				level: 1,
 				speedBonus: 1,
 			});
 
 			const gameState = createGameState(0);
-			gameState.generators = [yellow];
+			gameState.generators = [red];
 
-			updateGenerators([yellow], 1000, gameState);
+			updateGenerators([red], 1000, gameState);
 
 			// With speed bonus 1, fill time = 1000ms
 			// In 1000ms, should complete 1 cycle, so fillProgress should be 0
-			expect(yellow.fillProgress).toBeCloseTo(0, 1);
+			expect(red.fillProgress).toBeCloseTo(0, 1);
 		});
 	});
 });

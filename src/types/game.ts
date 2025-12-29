@@ -43,7 +43,7 @@ export interface Timestamps {
 
 export interface GameSettings {
     soundEnabled: boolean;
-    buyMode: number; // 1, 10, or -1 for MAX
+    buyMode: number; // 1, 10, -1 for MAX, or -2 for NEXT
     buyModeSticky: boolean;
     theme: 'purple' | 'green' | 'pastel' | 'nostalgia'; // Theme skin ID
 }

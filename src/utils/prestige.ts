@@ -40,3 +40,4 @@ export function updateIdleMultiplier(deltaTime: number, gameState: GameState): v
     gameState.prestige.currentIdleMultiplier = 1 + multiplierIncrease;
 }
 
+

@@ -66,7 +66,7 @@ export interface SaveData {
         // User settings
         settings: {
             soundEnabled: boolean;
-            buyMode: number;             // 1, 10, or -1 for MAX
+            buyMode: number;             // 1, 10, -1 for MAX, or -2 for NEXT
             buyModeSticky: boolean;
             theme: string;
         };

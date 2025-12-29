@@ -100,3 +100,4 @@ xcode-select --install
 2. Start an emulator before running `npx expo start --android`
 3. Or use a physical device with USB debugging enabled
 
+

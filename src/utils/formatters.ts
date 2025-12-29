@@ -32,3 +32,4 @@ export function formatNumber(num: Decimal | number): string {
     return scaled.toFixed(2) + unit;
 }
 
+

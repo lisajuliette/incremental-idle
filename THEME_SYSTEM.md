@@ -194,3 +194,4 @@ Users can change themes in the Settings screen:
 - Dark mode support
 - Animated theme transitions
 
+

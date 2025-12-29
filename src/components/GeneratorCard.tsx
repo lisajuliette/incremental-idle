@@ -1,21 +1,12 @@
 /**
  * Generator Card Component
- * Retro-styled card for displaying generator information
- * Inspired by Windows 95/98 and retro pixel art aesthetics
+ * Compact, color-themed card for displaying generator information
  */
 
 import React, { useRef, useEffect } from 'react';
-import {
-	View,
-	Text,
-	TouchableOpacity,
-	Animated,
-	StyleSheet,
-	Easing,
-} from 'react-native';
+import { View, Text, TouchableOpacity, Animated, Easing } from 'react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useTheme } from '../context/ThemeContext';
-import { getGeneratorColor } from '../theme/colors';
 import { Generator } from '../types/game';
 import Decimal from 'break_infinity.js';
 import {
@@ -24,9 +15,12 @@ import {
 	getMilestoneProgress,
 	maxAffordable,
 	bulkBuyCost,
-	unlockGenerator,
 } from '../utils/generators';
 import { formatNumber } from '../utils/formatters';
+import {
+	getGeneratorHexColor,
+	getGeneratorColorClasses,
+} from '../utils/generatorColors';
 
 interface GeneratorCardProps {
 	generator: Generator;
@@ -46,42 +40,109 @@ export default function GeneratorCard({
 	onBuy,
 	onUnlock,
 }: GeneratorCardProps) {
-	const { theme } = useTheme();
+	// Get color theming for this generator
+	const colorClasses = getGeneratorColorClasses(generator.name);
+	const hexColor = getGeneratorHexColor(generator.name);
 
 	// Animated values for progress bars
 	const milestoneProgressAnim = useRef(new Animated.Value(0)).current;
 	const fillProgressAnim = useRef(new Animated.Value(0)).current;
+	const milestonePathAnim = useRef(new Animated.Value(0)).current;
 
-	// Calculate values needed for hooks (even if generator is locked)
+	// Calculate values
 	const level = generator.level;
 	const isMaxed = level >= 400;
 	const milestoneProgress = getMilestoneProgress(level);
 	const fillPercent = Math.min(100, generator.fillProgress * 100);
 	const milestonePercent = Math.min(100, milestoneProgress.progress * 100);
 
-	// Animate progress bars smoothly with very frequent updates (16ms = one frame at 60fps)
-	// Remove refs from dependencies as they are stable and don't change
+	// Helper function to convert polar to cartesian coordinates
+	const polarToCartesian = (
+		centerX: number,
+		centerY: number,
+		radius: number,
+		angleInDegrees: number
+	) => {
+		const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
+		return {
+			x: centerX + radius * Math.cos(angleInRadians),
+			y: centerY + radius * Math.sin(angleInRadians),
+		};
+	};
+
+	// Helper function to describe an arc path
+	const describeArc = (
+		x: number,
+		y: number,
+		radius: number,
+		startAngle: number,
+		endAngle: number
+	) => {
+		const start = polarToCartesian(x, y, radius, endAngle);
+		const end = polarToCartesian(x, y, radius, startAngle);
+		const largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
+		const d = [
+			'M',
+			start.x,
+			start.y,
+			'A',
+			radius,
+			radius,
+			0,
+			largeArcFlag,
+			0,
+			end.x,
+			end.y,
+		].join(' ');
+		return d;
+	};
+
+	// Animate progress bars
 	useEffect(() => {
 		if (generator.unlocked) {
 			Animated.timing(milestoneProgressAnim, {
 				toValue: milestonePercent,
-				duration: 16, // One frame at 60fps for very smooth updates
+				duration: 16,
+				useNativeDriver: false,
+				easing: Easing.linear,
+			}).start();
+
+			// Also animate the path value for SVG
+			Animated.timing(milestonePathAnim, {
+				toValue: milestonePercent,
+				duration: 16,
 				useNativeDriver: false,
 				easing: Easing.linear,
 			}).start();
 		}
-	}, [milestonePercent, generator.unlocked]); // Removed milestoneProgressAnim from deps (stable ref)
+	}, [milestonePercent, generator.unlocked]);
+
+	// Calculate the current arc path based on animated value
+	const [currentPath, setCurrentPath] = React.useState(
+		describeArc(10, 10, 8, 0, 0.01)
+	);
+
+	useEffect(() => {
+		const listenerId = milestonePathAnim.addListener(({ value }) => {
+			const endAngle = Math.max(0.01, (value / 100) * 360);
+			setCurrentPath(describeArc(10, 10, 8, 0, endAngle));
+		});
+
+		return () => {
+			milestonePathAnim.removeListener(listenerId);
+		};
+	}, [milestonePathAnim]);
 
 	useEffect(() => {
 		if (generator.unlocked) {
 			Animated.timing(fillProgressAnim, {
 				toValue: fillPercent,
-				duration: 16, // One frame at 60fps for very smooth updates
+				duration: 16,
 				useNativeDriver: false,
 				easing: Easing.linear,
 			}).start();
 		}
-	}, [fillPercent, generator.unlocked]); // Removed fillProgressAnim from deps (stable ref)
+	}, [fillPercent, generator.unlocked]);
 
 	// Early return for locked generators
 	if (!generator.unlocked) {
@@ -90,474 +151,361 @@ export default function GeneratorCard({
 
 		return (
 			<View
-				className={`border-4 rounded mb-3 p-4 bg-white/40 ${
+				className={`border-2 rounded mb-2 p-2 ${colorClasses.bg} ${
 					canAffordUnlock ? 'opacity-100' : 'opacity-60'
 				}`}
-				style={{ borderColor: generator.color }}
+				style={{ borderColor: hexColor }}
 			>
-				<View className="flex-row items-center justify-center mb-3">
-					<View
-						className="w-5 h-5 rounded-full border-2 border-stone-800 mr-2"
-						style={{ backgroundColor: generator.color }}
-					/>
-					<Text
-						className="text-sm text-stone-600"
-						style={{ fontFamily: 'Jersey10' }}
-					>
-						{generator.name}
-					</Text>
-					<MaterialIcons
-						name="lock"
-						size={16}
-						color="#57534E"
-						className="ml-2"
-					/>
-				</View>
-				<Text
-					className="text-xs text-center mb-3 text-stone-500"
-					style={{ fontFamily: 'Jersey10' }}
-				>
-					Unlock Cost: {formatNumber(unlockCost)}
-				</Text>
-				{onUnlock && (
-					<TouchableOpacity
-						className={`p-3 rounded border-2 items-center justify-center ${
-							!canAffordUnlock ? 'opacity-50' : ''
-						}`}
-						style={
-							canAffordUnlock
-								? {
-										backgroundColor: generator.color,
-										borderColor: generator.color,
-								  }
-								: { backgroundColor: '#D6D3D1', borderColor: '#78716C' }
-						}
-						onPress={() => onUnlock(generator)}
-						disabled={!canAffordUnlock}
-					>
+				<View className="flex-row items-center justify-between">
+					<View className="flex-row items-center flex-1">
+						<View
+							className="w-4 h-4 rounded-full mr-2"
+							style={{ backgroundColor: hexColor }}
+						/>
 						<Text
-							className="text-[10px] uppercase text-stone-800"
+							className={`text-xs ${colorClasses.text}`}
 							style={{ fontFamily: 'Jersey10' }}
 						>
-							UNLOCK GENERATOR
+							{generator.name}
 						</Text>
-					</TouchableOpacity>
-				)}
+						<MaterialIcons
+							name="lock"
+							size={12}
+							color={hexColor}
+							className="ml-1"
+						/>
+					</View>
+					<Text
+						className={`text-[9px] ${colorClasses.text}`}
+						style={{ fontFamily: 'Jersey10' }}
+					>
+						{formatNumber(unlockCost)}
+					</Text>
+					{onUnlock && (
+						<TouchableOpacity
+							className={`ml-2 px-2 py-1 rounded ${colorClasses.accent} ${
+								!canAffordUnlock ? 'opacity-50' : ''
+							}`}
+							onPress={() => onUnlock(generator)}
+							disabled={!canAffordUnlock}
+						>
+							<Text
+								className="text-[8px] uppercase text-white"
+								style={{ fontFamily: 'Jersey10' }}
+							>
+								UNLOCK
+							</Text>
+						</TouchableOpacity>
+					)}
+				</View>
 			</View>
 		);
 	}
 
-	// Continue with unlocked generator logic
+	// Unlocked generator logic
 	const production = getProduction(generator);
 	const nextCost = getUpgradeCost(generator, 1);
-	const cost10 = getUpgradeCost(generator, 10);
-	const canAfford1 = gameState.currency.gte(nextCost);
-	const canAfford10 = gameState.currency.gte(cost10);
-
-	// Calculate max affordable for BUY MAX button
-	const maxAffordableAmount = maxAffordable(
-		gameState.currency,
-		generator.baseCost,
-		generator.growthRate,
-		generator.level,
-		generator.costReduction
-	);
-
-	const costMax =
-		maxAffordableAmount > 0
-			? getUpgradeCost(generator, maxAffordableAmount)
-			: new Decimal(0);
-	const canAfford = maxAffordableAmount > 0 && gameState.currency.gte(costMax);
-
-	// Determine buy mode for button styling
-	let buyAmount = gameState.settings.buyMode;
-	if (buyAmount === -1) {
-		buyAmount = maxAffordableAmount;
-	}
 
 	// Calculate cost to reach next milestone
 	let costToNextMilestone = new Decimal(0);
+	let levelsToNextMilestone = 0;
 	if (!isMaxed && milestoneProgress.next) {
-		const levelsNeeded = milestoneProgress.next - level;
-		if (levelsNeeded > 0) {
+		levelsToNextMilestone = milestoneProgress.next - level;
+		if (levelsToNextMilestone > 0) {
 			costToNextMilestone = bulkBuyCost(
 				generator.baseCost,
 				generator.growthRate,
 				generator.level,
-				levelsNeeded,
+				levelsToNextMilestone,
 				generator.costReduction
 			);
 		}
 	}
 
-	// Determine button style - use generator's color
-	const buttonStyleEnabled = {
-		backgroundColor: generator.color,
-		borderColor: generator.color,
-	};
-	const buttonStyleDisabled = {
-		backgroundColor: '#D6D3D1',
-		borderColor: '#78716C',
-	}; // stone-300 and stone-500
+	// Calculate buy amount based on buy mode
+	const buyMode = gameState.settings.buyMode;
+	let buyAmount = 1;
+	let buyCost = nextCost;
+	let canAffordBuy = gameState.currency.gte(nextCost);
+
+	if (buyMode === 10) {
+		buyAmount = 10;
+		buyCost = getUpgradeCost(generator, 10);
+		canAffordBuy = gameState.currency.gte(buyCost);
+	} else if (buyMode === -1) {
+		// MAX mode
+		const maxAffordableAmount = maxAffordable(
+			gameState.currency,
+			generator.baseCost,
+			generator.growthRate,
+			generator.level,
+			generator.costReduction
+		);
+		buyAmount = maxAffordableAmount;
+		buyCost =
+			maxAffordableAmount > 0
+				? getUpgradeCost(generator, maxAffordableAmount)
+				: new Decimal(0);
+		canAffordBuy = maxAffordableAmount > 0 && gameState.currency.gte(buyCost);
+	} else if (buyMode === -2) {
+		// NEXT mode - buy until next milestone
+		if (!isMaxed && milestoneProgress.next && levelsToNextMilestone > 0) {
+			buyAmount = levelsToNextMilestone;
+			buyCost = costToNextMilestone;
+			canAffordBuy = gameState.currency.gte(costToNextMilestone);
+		} else {
+			// No next milestone or already maxed
+			buyAmount = 0;
+			buyCost = new Decimal(0);
+			canAffordBuy = false;
+		}
+	}
+
+	const hasPrestigeBuffs =
+		generator.earnBonus.gt(1) ||
+		generator.speedBonus > 1 ||
+		generator.costReduction > 1;
 
 	return (
-		<View
-			className="border-4 rounded mb-3 p-3 bg-white/70"
-			style={{
-				borderColor: generator.color,
-				shadowColor: generator.color,
-				shadowOffset: { width: 2, height: 2 },
-				shadowOpacity: 0.2,
-				shadowRadius: 0,
-				elevation: 4,
-			}}
-		>
-			{/* Header */}
-			<View className="flex-row items-center mb-3">
-				<View
-					className="w-5 h-5 rounded-full border-2 border-stone-800 mr-2"
-					style={{ backgroundColor: generator.color }}
-				/>
-				<Text
-					className="flex-1 text-sm text-stone-800"
-					style={{ fontFamily: 'Jersey10' }}
-				>
-					{generator.name}
-				</Text>
-				<Text
-					className="text-xs ml-2 text-stone-600"
-					style={{ fontFamily: 'Jersey10' }}
-				>
-					Lv. {level}
-				</Text>
-				{isMaxed && (
-					<View className="flex-row items-center ml-2">
-						<MaterialIcons
-							name="star"
-							size={14}
-							color="#FFD93D"
-							className="mr-1"
-						/>
+		<View className="mb-2">
+			{/* Card Content */}
+			<View
+				className="border-2 rounded p-2"
+				style={{
+					borderColor: hexColor,
+					backgroundColor: 'rgba(255, 255, 255, 0.9)',
+					shadowColor: hexColor,
+					shadowOffset: { width: 1, height: 1 },
+					shadowOpacity: 0.15,
+					shadowRadius: 0,
+					elevation: 2,
+				}}
+			>
+				{/* Compact Header Row */}
+				<View className="flex-row items-center justify-between mb-1">
+					<View className="flex-row items-center flex-1">
+						{/* Generator Color Circle with Circular Progress Indicator */}
+						<View
+							className="mr-1.5"
+							style={{
+								position: 'relative',
+								width: 20,
+								height: 20,
+								justifyContent: 'center',
+								alignItems: 'center',
+							}}
+						>
+							{/* Solid white circle (16px = w-4 h-4) with level number */}
+							<View
+								className="w-4 h-4 rounded-full flex items-center justify-center"
+								style={{
+									backgroundColor: '#FFFFFF',
+									borderWidth: 1,
+									borderColor: hexColor,
+								}}
+							>
+								<Text
+									className="text-[7px] leading-none"
+									style={{ fontFamily: 'Jersey10', color: hexColor }}
+								>
+									{level}
+								</Text>
+							</View>
+							{/* Circular progress outline - 2px margin (16px + 2px + 2px = 20px total) */}
+							{!isMaxed && (
+								<View
+									style={{
+										position: 'absolute',
+										width: 20,
+										height: 20,
+									}}
+									pointerEvents="none"
+								>
+									<Svg width={20} height={20}>
+										{/* Background circle (incomplete portion) */}
+										<Circle
+											cx={10}
+											cy={10}
+											r={8}
+											stroke={hexColor}
+											strokeWidth={2}
+											fill="none"
+											opacity={0.2}
+										/>
+										{/* Progress arc */}
+										{milestonePercent > 0 && (
+											<Path
+												d={currentPath}
+												stroke={hexColor}
+												strokeWidth={2}
+												strokeLinecap="round"
+												fill="none"
+											/>
+										)}
+									</Svg>
+								</View>
+							)}
+						</View>
 						<Text
-							className="text-xs text-yellow-400"
+							className={`text-xs ${colorClasses.text}`}
 							style={{ fontFamily: 'Jersey10' }}
 						>
-							MAX
+							{generator.name}
 						</Text>
-					</View>
-				)}
-			</View>
-
-			{/* Milestone Progress */}
-			{!isMaxed && (
-				<View className="mb-3">
-					<View className="flex-row items-center justify-between mb-1">
-						<View className="flex-row items-center">
+						<Text
+							className={`text-[9px] ml-1 ${colorClasses.text}`}
+							style={{ fontFamily: 'Jersey10' }}
+						>
+							Lv.{level}
+						</Text>
+						{isMaxed && (
 							<MaterialIcons
-								name="trending-up"
+								name="star"
 								size={12}
-								color="#57534E"
-								className="mr-1.5"
+								color={hexColor}
+								className="ml-1"
 							/>
-							<Text
-								className="text-[10px] text-stone-600"
-								style={{ fontFamily: 'Jersey10' }}
-							>
-								Milestone ({milestoneProgress.next || 'MAX'})
-							</Text>
-						</View>
-						{costToNextMilestone.gt(0) && (
-							<Text
-								className="text-[9px] text-stone-600"
-								style={{ fontFamily: 'Jersey10' }}
-							>
-								{formatNumber(costToNextMilestone)}
-							</Text>
 						)}
+						{/* {hasPrestigeBuffs && (
+							<MaterialIcons
+								name="stars"
+								size={10}
+								color={hexColor}
+								className="ml-1"
+							/>
+						)} */}
 					</View>
-					<View className="h-4 border-2 border-stone-400 rounded relative overflow-hidden bg-stone-300/50">
+					<Text
+						className={`text-[9px] ${colorClasses.text}`}
+						style={{ fontFamily: 'Jersey10' }}
+					>
+						${formatNumber(production)}
+					</Text>
+				</View>
+
+				{/* Windows 95/98 Style Progress Bar */}
+				<View className="mb-1">
+					<View
+						style={{
+							height: 16,
+							borderWidth: 2,
+							borderTopColor: '#FFFFFF',
+							borderLeftColor: '#FFFFFF',
+							borderRightColor: '#808080',
+							borderBottomColor: '#808080',
+							backgroundColor: '#C0C0C0',
+							position: 'relative',
+							overflow: 'hidden',
+						}}
+					>
+						{/* Progress fill with Windows-style gradient effect */}
 						<Animated.View
-							className="h-full absolute left-0 top-0"
 							style={{
-								width: milestoneProgressAnim.interpolate({
+								position: 'absolute',
+								left: 0,
+								top: 0,
+								bottom: 0,
+								width: fillProgressAnim.interpolate({
 									inputRange: [0, 100],
 									outputRange: ['0%', '100%'],
 								}),
-								backgroundColor: generator.color,
+								backgroundColor: hexColor, // Generator's themed color
 							}}
-						/>
-						<Text
-							className="absolute top-0 left-0 right-0 bottom-0 text-center text-[9px] text-stone-800"
-							style={{ fontFamily: 'Jersey10', lineHeight: 16 }}
 						>
-							{Math.floor(milestoneProgress.progress * 100)}%
-						</Text>
+							{/* Inner highlight for 3D effect */}
+							<View
+								style={{
+									position: 'absolute',
+									left: 0,
+									top: 0,
+									right: 0,
+									height: '50%',
+									backgroundColor: 'rgba(255, 255, 255, 0.3)',
+								}}
+							/>
+						</Animated.View>
 					</View>
 				</View>
-			)}
 
-			{/* Production Cycle */}
-			<View className="mb-3">
-				<View className="flex-row items-center mb-1">
-					<MaterialIcons
-						name="autorenew"
-						size={12}
-						color="#57534E"
-						className="mr-1.5"
-					/>
-					<Text
-						className="text-[10px] text-stone-600"
-						style={{ fontFamily: 'Jersey10' }}
-					>
-						Production Cycle
-					</Text>
-				</View>
-				<View className="h-3 border-2 border-stone-400 rounded relative overflow-hidden bg-stone-300/50">
-					<Animated.View
-						className="h-full absolute left-0 top-0"
-						style={{
-							width: fillProgressAnim.interpolate({
-								inputRange: [0, 100],
-								outputRange: ['0%', '100%'],
-							}),
-							backgroundColor: generator.color,
+				{/* Boost Info Row */}
+				<View className="flex-row items-center justify-between w-full gap-2">
+					<View className="flex-row items-center gap-2 mb-1">
+						{hasPrestigeBuffs && (
+							<>
+								{generator.earnBonus.gt(1) && (
+									<View className="flex-row items-center">
+										<MaterialIcons
+											name="attach-money"
+											size={10}
+											color={hexColor}
+										/>
+										<Text
+											className={`text-[8px] ml-0.5 ${colorClasses.text}`}
+											style={{ fontFamily: 'Jersey10' }}
+										>
+											×{generator.earnBonus.toFixed(1)}
+										</Text>
+									</View>
+								)}
+								{generator.speedBonus > 1 && (
+									<View className="flex-row items-center">
+										<MaterialIcons name="speed" size={10} color={hexColor} />
+										<Text
+											className={`text-[8px] ml-0.5 ${colorClasses.text}`}
+											style={{ fontFamily: 'Jersey10' }}
+										>
+											×{generator.speedBonus.toFixed(1)}
+										</Text>
+									</View>
+								)}
+								{generator.costReduction > 1 && (
+									<View className="flex-row items-center">
+										<MaterialIcons
+											name="local-offer"
+											size={10}
+											color={hexColor}
+										/>
+										<Text
+											className={`text-[8px] ml-0.5 ${colorClasses.text}`}
+											style={{ fontFamily: 'Jersey10' }}
+										>
+											×{generator.costReduction.toFixed(1)}
+										</Text>
+									</View>
+								)}
+							</>
+						)}
+					</View>
+
+					{/* Single Buy Button - Smaller */}
+					<TouchableOpacity
+						className={`px-1.5 py-1 rounded border min-w-[60px] ${
+							colorClasses.accent
+						} ${!canAffordBuy ? 'opacity-50' : ''}`}
+						style={{ borderColor: hexColor, alignSelf: 'flex-start' }}
+						onPress={() => {
+							if (buyMode === -1) {
+								onBuy(generator, -1);
+							} else if (buyMode === -2) {
+								onBuy(generator, buyAmount);
+							} else {
+								onBuy(generator, buyAmount);
+							}
 						}}
-					/>
-					<Text
-						className="absolute top-0 left-0 right-0 bottom-0 text-center text-[8px] text-stone-800"
-						style={{ fontFamily: 'Jersey10', lineHeight: 12 }}
+						disabled={!canAffordBuy || buyAmount === 0}
 					>
-						{fillPercent.toFixed(0)}%
-					</Text>
-				</View>
-			</View>
-
-			{/* Stats */}
-			<View className="mb-3">
-				<View className="flex-row justify-between items-center mb-1">
-					<View className="flex-row items-center">
-						<MaterialIcons
-							name="show-chart"
-							size={12}
-							color="#57534E"
-							className="mr-1.5"
-						/>
-						<Text
-							className="text-[10px] text-stone-600"
-							style={{ fontFamily: 'Jersey10' }}
-						>
-							Production:
-						</Text>
-					</View>
-					<Text
-						className="text-[10px] text-stone-800"
-						style={{ fontFamily: 'Jersey10' }}
-					>
-						{formatNumber(production)}/fill
-					</Text>
-				</View>
-				<View className="flex-row justify-between items-center">
-					<View className="flex-row items-center">
-						<MaterialIcons
-							name="arrow-upward"
-							size={12}
-							color="#57534E"
-							className="mr-1.5"
-						/>
-						<Text
-							className="text-[10px] text-stone-600"
-							style={{ fontFamily: 'Jersey10' }}
-						>
-							Next:
-						</Text>
-					</View>
-					<Text
-						className="text-[10px] text-stone-800"
-						style={{ fontFamily: 'Jersey10' }}
-					>
-						{formatNumber(nextCost)}
-					</Text>
-				</View>
-			</View>
-
-			{/* Prestige Buffs */}
-			{(generator.earnBonus.gt(1) ||
-				generator.speedBonus > 1 ||
-				generator.costReduction > 1) && (
-				<View className="mb-3 p-2 bg-yellow-100/50 border-2 border-yellow-400/50 rounded">
-					<View className="flex-row items-center mb-1.5">
-						<MaterialIcons
-							name="stars"
-							size={12}
-							color="#F59E0B"
-							className="mr-1.5"
-						/>
-						<Text
-							className="text-[9px] text-yellow-700 uppercase"
-							style={{ fontFamily: 'Jersey10' }}
-						>
-							Prestige Buffs:
-						</Text>
-					</View>
-					{generator.earnBonus.gt(1) && (
-						<View className="flex-row justify-between items-center mb-0.5">
-							<View className="flex-row items-center">
-								<MaterialIcons
-									name="attach-money"
-									size={10}
-									color="#F59E0B"
-									className="mr-1"
-								/>
-								<Text
-									className="text-[9px] text-yellow-700"
-									style={{ fontFamily: 'Jersey10' }}
-								>
-									Earn:
-								</Text>
-							</View>
+						<View className="flex-row items-center justify-center gap-0.5">
+							<MaterialIcons name="shopping-cart" size={10} color="#FFFFFF" />
 							<Text
-								className="text-[9px] text-yellow-800"
+								className="text-[8px] uppercase text-white"
 								style={{ fontFamily: 'Jersey10' }}
 							>
-								×{generator.earnBonus.toFixed(2)}
+								{buyAmount > 0 ? buyAmount : '-'}
 							</Text>
 						</View>
-					)}
-					{generator.speedBonus > 1 && (
-						<View className="flex-row justify-between items-center mb-0.5">
-							<View className="flex-row items-center">
-								<MaterialIcons
-									name="speed"
-									size={10}
-									color="#F59E0B"
-									className="mr-1"
-								/>
-								<Text
-									className="text-[9px] text-yellow-700"
-									style={{ fontFamily: 'Jersey10' }}
-								>
-									Speed:
-								</Text>
-							</View>
-							<Text
-								className="text-[9px] text-yellow-800"
-								style={{ fontFamily: 'Jersey10' }}
-							>
-								×{generator.speedBonus.toFixed(2)}
-							</Text>
-						</View>
-					)}
-					{generator.costReduction > 1 && (
-						<View className="flex-row justify-between items-center">
-							<View className="flex-row items-center">
-								<MaterialIcons
-									name="trending-down"
-									size={10}
-									color="#F59E0B"
-									className="mr-1"
-								/>
-								<Text
-									className="text-[9px] text-yellow-700"
-									style={{ fontFamily: 'Jersey10' }}
-								>
-									Cost:
-								</Text>
-							</View>
-							<Text
-								className="text-[9px] text-yellow-800"
-								style={{ fontFamily: 'Jersey10' }}
-							>
-								×{generator.costReduction.toFixed(2)}
-							</Text>
-						</View>
-					)}
-				</View>
-			)}
-
-			{/* Buy Buttons */}
-			<View className="flex-row gap-2 flex-wrap">
-				<View className="flex-1 min-w-[70px]">
-					<TouchableOpacity
-						className={`p-2 rounded border-2 items-center justify-center ${
-							!canAfford1 ? 'opacity-50' : ''
-						}`}
-						style={canAfford1 ? buttonStyleEnabled : buttonStyleDisabled}
-						onPress={() => onBuy(generator, 1)}
-						disabled={!canAfford1}
-					>
-						<Text
-							className="text-[9px] uppercase text-stone-800"
-							style={{ fontFamily: 'Jersey10' }}
-						>
-							BUY 1
-						</Text>
 					</TouchableOpacity>
-					<Text
-						className="text-center mt-1 text-[8px] text-stone-600"
-						style={{ fontFamily: 'Jersey10' }}
-					>
-						{formatNumber(nextCost)}
-					</Text>
-				</View>
-				<View className="flex-1 min-w-[70px]">
-					<TouchableOpacity
-						className={`p-2 rounded border-2 items-center justify-center ${
-							!canAfford10 ? 'opacity-50' : ''
-						}`}
-						style={canAfford10 ? buttonStyleEnabled : buttonStyleDisabled}
-						onPress={() => onBuy(generator, 10)}
-						disabled={!canAfford10}
-					>
-						<Text
-							className="text-[9px] uppercase text-stone-800"
-							style={{ fontFamily: 'Jersey10' }}
-						>
-							BUY 10
-						</Text>
-					</TouchableOpacity>
-					<Text
-						className="text-center mt-1 text-[8px] text-stone-600"
-						style={{ fontFamily: 'Jersey10' }}
-					>
-						{formatNumber(cost10)}
-					</Text>
-				</View>
-				<View className="flex-1 min-w-[70px]">
-					<TouchableOpacity
-						className={`p-2 rounded border-2 items-center justify-center ${
-							!canAfford ? 'opacity-50' : ''
-						}`}
-						style={canAfford ? buttonStyleEnabled : buttonStyleDisabled}
-						onPress={() => onBuy(generator, -1)}
-						disabled={!canAfford}
-					>
-						<Text
-							className="text-[9px] uppercase text-stone-800"
-							style={{ fontFamily: 'Jersey10' }}
-						>
-							BUY MAX
-						</Text>
-					</TouchableOpacity>
-					<Text
-						className="text-center mt-1 text-[8px] text-stone-600"
-						style={{ fontFamily: 'Jersey10' }}
-					>
-						{formatNumber(costMax)}
-					</Text>
-					{maxAffordableAmount > 0 && (
-						<Text
-							className="text-center mt-0.5 text-[7px] text-stone-500"
-							style={{ fontFamily: 'Jersey10' }}
-						>
-							({maxAffordableAmount})
-						</Text>
-					)}
 				</View>
 			</View>
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	// Only keep styles that can't be done with Tailwind (shadows, elevation)
-});

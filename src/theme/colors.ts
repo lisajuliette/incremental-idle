@@ -106,16 +106,26 @@ export function buildTheme(skin: SkinDefinition): Theme {
         },
         
         // Generator colors (fixed - these represent game mechanics)
+        // Note: Generator colors are now handled by generatorColors utility
+        // This is kept for backward compatibility
         generators: {
-            yellow: 'bg-yellow-400',
-            rose: 'bg-pink-400',
-            sky: 'bg-sky-400',
-            mint: 'bg-emerald-400',
-            lavender: 'bg-purple-300',
-            peach: 'bg-orange-300',
-            cyan: 'bg-cyan-400',
-            coral: 'bg-red-400',
-            pearl: 'bg-purple-100',
+            red: 'bg-red-500',
+            orange: 'bg-orange-500',
+            amber: 'bg-amber-500',
+            yellow: 'bg-yellow-500',
+            lime: 'bg-lime-500',
+            green: 'bg-green-500',
+            emerald: 'bg-emerald-500',
+            teal: 'bg-teal-500',
+            cyan: 'bg-cyan-500',
+            sky: 'bg-sky-500',
+            blue: 'bg-blue-500',
+            indigo: 'bg-indigo-500',
+            violet: 'bg-violet-500',
+            purple: 'bg-purple-500',
+            fuchsia: 'bg-fuchsia-500',
+            pink: 'bg-pink-500',
+            rose: 'bg-rose-500',
         },
         
         // Button colors using skin accents
@@ -173,18 +183,27 @@ export function getTheme(skinId: SkinId): Theme {
 /**
  * Helper function to get generator color by name
  * (Generator colors are fixed regardless of skin)
+ * @deprecated Use getGeneratorColorClasses from utils/generatorColors instead
  */
 export function getGeneratorColor(name: string, theme: Theme): string {
     const colorMap: Record<string, string> = {
+        'Red': theme.generators.red,
+        'Orange': theme.generators.orange,
+        'Amber': theme.generators.amber,
         'Yellow': theme.generators.yellow,
-        'Rose': theme.generators.rose,
-        'Sky': theme.generators.sky,
-        'Mint': theme.generators.mint,
-        'Lavender': theme.generators.lavender,
-        'Peach': theme.generators.peach,
+        'Lime': theme.generators.lime,
+        'Green': theme.generators.green,
+        'Emerald': theme.generators.emerald,
+        'Teal': theme.generators.teal,
         'Cyan': theme.generators.cyan,
-        'Coral': theme.generators.coral,
-        'Pearl': theme.generators.pearl,
+        'Sky': theme.generators.sky,
+        'Blue': theme.generators.blue,
+        'Indigo': theme.generators.indigo,
+        'Violet': theme.generators.violet,
+        'Purple': theme.generators.purple,
+        'Fuchsia': theme.generators.fuchsia,
+        'Pink': theme.generators.pink,
+        'Rose': theme.generators.rose,
     };
-    return colorMap[name] || theme.generators.yellow;
+    return colorMap[name] || theme.generators.red;
 }

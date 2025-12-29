@@ -105,3 +105,4 @@ export const MILESTONES = [25, 50, 100, 200, 400];
 
 export const GAME_VERSION = '1.0.0';
 
+

@@ -164,7 +164,7 @@ export default function SettingsScreen() {
 									Buy Mode:
 								</Text>
 							</View>
-							<View className="flex-row gap-2">
+							<View className="flex-row gap-2 flex-wrap">
 								<TouchableOpacity
 									className={`p-2 min-w-[50px] ${
 										gameState.settings.buyMode === 1
@@ -217,6 +217,24 @@ export default function SettingsScreen() {
 										}`}
 									>
 										MAX
+									</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									className={`p-2 min-w-[50px] ${
+										gameState.settings.buyMode === -2
+											? `${theme.button.success} border-green-600`
+											: 'bg-stone-300 border-stone-400'
+									} border-2 rounded items-center`}
+									onPress={() => handleBuyModeChange(-2)}
+								>
+									<Text
+										className={`text-xs font-mono ${
+											gameState.settings.buyMode === -2
+												? 'text-white'
+												: theme.text.primary
+										}`}
+									>
+										NEXT
 									</Text>
 								</TouchableOpacity>
 							</View>

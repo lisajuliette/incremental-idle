@@ -98,3 +98,4 @@ export function getSaveDataSize(saveData: SaveData): number {
     return JSON.stringify(saveData).length;
 }
 
+
